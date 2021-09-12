@@ -1,0 +1,6 @@
+.stage{
+  width: 1000px;
+  display: inline-block;
+  margin:0 auto;
+  border: 1px solid chartreuse;
+}
