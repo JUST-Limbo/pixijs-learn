@@ -1,12 +1,13 @@
 const app = new PIXI.Application({
-	width: 1000,
-	height: 1000,
+	width: 800,
+	height: 800,
 	transparent: true
 })
 document.getElementById('stage').appendChild(app.view)
 
 let container = new PIXI.Container()
-container.position.set(200, 200)
+container.name = 'container'
+container.position.set(0, 0)
 container.width = 150
 container.height = 150
 
@@ -41,8 +42,8 @@ container.addChild(borderline)
 container.addChild(resizeBtn)
 container.addChild(delBtn)
 
-cat.on('touchstart', catTouchStart).on('touchmove', catTouchMove).on('touchend', catTouchEnd)
 //拖拽
+cat.on('pointerdown', catPointerDown).on('pointermove', catPointerMove).on('pointerup', pointerUp)
 let startPos = {
 	x: 0,
 	y: 0
@@ -51,11 +52,74 @@ let objPos = {
 	x: 0,
 	y: 0
 }
-function catTouchStart(e) {
+let targetName = ''
+function catPointerDown(e) {
+	console.log(e)
+	targetName = this.parent.name
 	this.parent.children[1].visible = true
 	this.parent.children[2].visible = true
 	this.parent.children[3].visible = true
+
+	startPos = {
+		x: e.data.global.x,
+		y: e.data.global.y
+	}
+
+	objPos = {
+		x: this.parent.getGlobalPosition().x,
+		y: this.parent.getGlobalPosition().y
+	}
 }
-function catTouchMove(e) {}
-function catTouchEnd(e) {}
+function catPointerMove(e) {
+	// console.log(e)
+	if (this.parent.name == targetName) {
+		let tempPos = {
+			x: e.data.global.x,
+			y: e.data.global.y
+		}
+
+		this.parent.position.set(objPos.x + (tempPos.x - startPos.x), objPos.y + (tempPos.y - startPos.y))
+	}
+}
+function pointerUp(e) {
+	targetName = ''
+}
+
+// 缩放
+resizeBtn.on('pointerdown', resizePointerDown).on('pointermove', resizePointerMove).on('pointerup', pointerUp).on('pointerupoutside', pointerUp)
+
+let resizeStartPosX = 0
+
+function resizePointerDown(e) {
+	if (this.name == 'resizeBtn') {
+		targetName = 'resizeBtn'
+		resizeStartPosX = e.data.global.x
+		console.log('resizePointerDown', e)
+	}
+}
+function resizePointerMove(e) {
+	if (this.name == 'resizeBtn' && targetName == 'resizeBtn') {
+		console.log('resizePointerMove', e)
+		let tempPosX = e.data.global.x
+
+		let dur = tempPosX - resizeStartPosX
+		resizeStartPosX = tempPosX
+
+		if (dur > 0) {
+			//放大
+			let scale1 = app.stage.getChildByName('container').scale.x + 0.03
+			if (app.stage.getChildByName('container').scale.x <= 1.5) {
+				app.stage.getChildByName('container').scale.set(scale1, scale1)
+			}
+		}
+
+		if (dur < 0) {
+			//缩小
+			if (app.stage.getChildByName('container').scale.x >= 0.4) {
+				let sclae2 = app.stage.getChildByName('container').scale.x - 0.03
+				app.stage.getChildByName('container').scale.set(sclae2, sclae2)
+			}
+		}
+	}
+}
 app.stage.addChild(container)
