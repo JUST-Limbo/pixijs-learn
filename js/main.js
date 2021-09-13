@@ -54,7 +54,7 @@ let objPos = {
 }
 let targetName = ''
 function catPointerDown(e) {
-	console.log(e)
+  console.log(this.parent)
 	targetName = this.parent.name
 	this.parent.children[1].visible = true
 	this.parent.children[2].visible = true
@@ -94,12 +94,10 @@ function resizePointerDown(e) {
 	if (this.name == 'resizeBtn') {
 		targetName = 'resizeBtn'
 		resizeStartPosX = e.data.global.x
-		console.log('resizePointerDown', e)
 	}
 }
 function resizePointerMove(e) {
 	if (this.name == 'resizeBtn' && targetName == 'resizeBtn') {
-		console.log('resizePointerMove', e)
 		let tempPosX = e.data.global.x
 
 		let dur = tempPosX - resizeStartPosX
