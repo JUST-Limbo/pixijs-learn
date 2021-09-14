@@ -49,7 +49,7 @@ container.addChild(cat)
 // container.addChild(resizeBtn)
 // container.addChild(delBtn)
 
-//拖拽
+//旋转
 container.on('pointerdown', catPointerDown).on('pointermove', catPointerMove).on('pointerup', pointerUp)
 let startPos = {
 	x: 0,
@@ -66,8 +66,9 @@ let rotatePosition = {
 }
 let originDeg
 let moveDeg
+let beginDeg = 0
 function catPointerDown(e) {
-  targetName=this.name
+	targetName = this.name
 	// console.log(`旋转中心坐标(${container.getGlobalPosition().x + container.width / 2}, ${container.getGlobalPosition().y + container.height / 2})`)
 	// console.log(e)
 	console.log(e.data.global)
@@ -87,7 +88,7 @@ function catPointerDown(e) {
 	// console.log(originDeg)
 }
 function catPointerMove(e) {
-  if(targetName!==this.name) return
+	if (targetName !== this.name) return
 	let tempPos = {
 		x: e.data.global.x,
 		y: e.data.global.y
@@ -102,13 +103,12 @@ function catPointerMove(e) {
 	}
 	// console.log(moveDeg)
 	let includedAngle = moveDeg - originDeg
-  includedAngle = (includedAngle/360)*(2* Math.PI)
-  console.log(includedAngle)
-  container.rotation=includedAngle
+	includedAngle = (includedAngle / 360) * (2 * Math.PI) // 弧度
+	container.rotation = beginDeg + includedAngle
 }
 function pointerUp(e) {
+	beginDeg = container.rotation
 	targetName = ''
 }
-
 
 app.stage.addChild(container)
