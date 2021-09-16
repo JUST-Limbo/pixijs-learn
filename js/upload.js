@@ -10,7 +10,7 @@ function appendToStage(child) {
 }
 
 // 从一个普通的JavaScriptImage对象创建一个纹理
-function transformImgElementToSprite(imgFile) {
+function transformImgFileToSprite(imgFile) {
 	let imageEle = new Image()
 	imageEle.src = window.URL.createObjectURL(imgFile)
 
@@ -22,7 +22,7 @@ function transformImgElementToSprite(imgFile) {
 
 function uploadFile() {
 	document.getElementById('previewImg').src = window.URL.createObjectURL(this.files[0])
-	let imgSprite = transformImgElementToSprite(this.files[0])
+	let imgSprite = transformImgFileToSprite(this.files[0])
 	appendToStage(imgSprite)
 }
 
