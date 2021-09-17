@@ -25,13 +25,13 @@ function transformImgFileToSprite(imgFile) {
 	return sprite
 }
 
-function uploadFileToStage() {
+function importFileToStage() {
 	// document.getElementById('previewImg').src = window.URL.createObjectURL(this.files[0])
 	let imgSprite = transformImgFileToSprite(this.files[0])
 	appendToStage(imgSprite)
 }
 
-document.getElementById('inputFile').addEventListener('change', uploadFileToStage)
+document.getElementById('inputFile').addEventListener('change', importFileToStage)
 
 function exportImg() {
 	if (!app.stage.height || !app.stage.width) {
