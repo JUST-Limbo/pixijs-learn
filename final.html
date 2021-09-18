@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<script src="./js/pixi.min.js"></script>
+		<link rel="stylesheet" href="./style/style.css" />
+	</head>
+	<body>
+		<div class="container">
+			<fieldset style="width: 500px">
+				<label for="file">上传图片</label>
+				<input type="file" name="inputFile" id="inputFile" accept="image/jpg,image/jpeg,image/png,image/PNG" />
+				<button onclick="exportStage()">导出stage</button>
+				<button onclick="exportCanvasImg()">导出canvas</button>
+			</fieldset>
+			<div id="stage" class="stage"></div>
+		</div>
+		<script src="./js/final.js"></script>
+	</body>
+</html>
