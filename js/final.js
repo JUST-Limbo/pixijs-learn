@@ -10,7 +10,7 @@ document.getElementById('inputFile').addEventListener('change', importFileToStag
 let containerIndex = 0
 let actionType = ''
 let targetName = ''
-let currentTargetName = ''
+let pointerDownTargetName = ''
 let dragPointerStartPos = {
 	x: 0,
 	y: 0
@@ -19,6 +19,9 @@ let dragParentStartPos = {
 	x: 0,
 	y: 0
 }
+let resizeStartPosX = 0
+let originDeg
+let beginDeg = 0
 
 function importFileToStage() {
 	let container = new PIXI.Container()
@@ -38,24 +41,37 @@ function importFileToStage() {
 
 		let resizeBtn = new PIXI.Sprite.fromImage('../images/scale.png')
 		resizeBtn.name = 'resizeBtn'
-		resizeBtn.width = 30
-		resizeBtn.height = 30
+		resizeBtn.width = 15
+		resizeBtn.height = 15
 		resizeBtn.interactive = true
 		resizeBtn.visible = true
 		resizeBtn.cursor = 'se-resize'
 		resizeBtn.position.set(container.getBounds().width - resizeBtn.width, container.getBounds().height - resizeBtn.height)
+		resizeBtn.on('pointerdown', pointerDown).on('pointermove', pointerMove).on('pointerup', pointerUp).on('pointerupoutside', pointerUp)
 		container.addChild(resizeBtn)
 
-		console.log(container.getBounds())
+		let rotateBtn = new PIXI.Sprite.fromImage('../images/rotate.png')
+		rotateBtn.name = 'rotateBtn'
+		rotateBtn.width = 15
+		rotateBtn.height = 15
+		rotateBtn.interactive = true
+		rotateBtn.visible = true
+		rotateBtn.cursor = 'grab'
+		rotateBtn.position.set(0, container.getBounds().height - rotateBtn.height)
+		rotateBtn.on('pointerdown', pointerDown).on('pointermove', pointerMove).on('pointerup', pointerUp).on('pointerupoutside', pointerUp)
+		container.addChild(rotateBtn)
+
+		container.pivot.set(container.getBounds().width / 2, container.getBounds().height / 2)
+		container.on('pointerover', pointerover).on('pointerout', pointerout)
 	}
-	// container.on('pointerdown', pointerDown).on('pointerup', pointerUp)
 	appendToStage(container)
 }
 
 function pointerDown(e) {
-	console.log(this)
+	// drag
 	if (this.name == 'importImg') {
 		targetName = this.parent.name
+		pointerDownTargetName = this.name
 		dragPointerStartPos = {
 			x: e.data.global.x,
 			y: e.data.global.y
@@ -64,21 +80,86 @@ function pointerDown(e) {
 			x: this.parent.getGlobalPosition().x,
 			y: this.parent.getGlobalPosition().y
 		}
+	} else if (this.name == 'resizeBtn') {
+		targetName = this.parent.name
+		pointerDownTargetName = this.name
+		resizeStartPosX = e.data.global.x
+	} else if (this.name == 'rotateBtn') {
+		targetName = this.parent.name
+		pointerDownTargetName = this.name
+		dragPointerStartPos = {
+			x: e.data.global.x,
+			y: e.data.global.y
+		}
+		let ex = dragPointerStartPos.x - this.parent.position.x
+		let ey = dragPointerStartPos.y - this.parent.position.y
+		originDeg = (360 * Math.atan(ey / ex)) / (2 * Math.PI)
+		if (ex < 0) {
+			originDeg += 180
+		} else if (ey < 0) {
+			originDeg += 360
+		}
 	}
 }
 
 function pointerMove(e) {
-	if (this.parent.name == targetName) {
+	if (this.parent.name !== targetName || this.name !== pointerDownTargetName) return
+	if (this.name == 'importImg') {
+		this.parent.alpha = 0.5
 		let currentPointerPos = {
 			x: e.data.global.x,
 			y: e.data.global.y
 		}
 		this.parent.position.set(dragParentStartPos.x + (currentPointerPos.x - dragPointerStartPos.x), dragParentStartPos.y + (currentPointerPos.y - dragPointerStartPos.y))
+	} else if (this.name == 'resizeBtn') {
+		this.parent.alpha = 0.5
+		let tempPosX = e.data.global.x
+		let dur = Math.abs(tempPosX - this.parent.position.x) - Math.abs(resizeStartPosX - this.parent.position.x)
+		resizeStartPosX = tempPosX
+		if (dur > 0) {
+			//放大
+			let scale1 = this.parent.scale.x + 0.03
+			this.parent.scale.set(scale1, scale1)
+		} else if (dur < 0) {
+			//缩小
+			let sclae2 = this.parent.scale.x - 0.03
+			this.parent.scale.set(sclae2, sclae2)
+		}
+	} else if (this.name == 'rotateBtn') {
+		this.parent.alpha = 0.5
+		let tempPos = {
+			x: e.data.global.x,
+			y: e.data.global.y
+		}
+		let ex = tempPos.x - this.parent.position.x
+		let ey = tempPos.y - this.parent.position.y
+		moveDeg = (360 * Math.atan(ey / ex)) / (2 * Math.PI)
+		if (ex < 0) {
+			moveDeg += 180
+		} else if (ey < 0) {
+			moveDeg += 360
+		}
+		let includedAngle = moveDeg - originDeg
+		includedAngle = (includedAngle / 360) * (2 * Math.PI) // 弧度
+		this.parent.rotation = beginDeg + includedAngle
 	}
 }
 
 function pointerUp() {
+	if (this.parent.name !== targetName || this.name !== pointerDownTargetName) return
+	if (this.name == 'rotateBtn') {
+		beginDeg = this.parent.rotation
+	}
 	targetName = ''
+	pointerDownTargetName = ''
+}
+
+function pointerover() {
+	this.alpha = 0.5
+}
+
+function pointerout() {
+	this.alpha = 1
 }
 
 function appendToStage(child) {
