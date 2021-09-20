@@ -147,7 +147,25 @@ function pointerMove(e) {
 
 function pointerUp() {
 	if (this.parent.name !== targetName || this.name !== pointerDownTargetName) return
-	if (this.name == 'rotateBtn') {
+	if (this.name == 'importImg') {
+		let containerArr = app.stage.children
+		let nearestContainer
+		let nearestDistance
+		containerArr.forEach((item, index, arr) => {
+			if (item.name == this.parent.name) return
+			let distance = calcDistance(this.parent.position, item.position)
+			if (nearestDistance == undefined) {
+				nearestContainer = item
+				nearestDistance = distance
+			} else if (distance < nearestDistance) {
+				nearestContainer = item
+				nearestDistance = distance
+			}
+		})
+		if (nearestDistance < 100) {
+			this.parent.position.set(nearestContainer.position.x, nearestContainer.position.y)
+		}
+	} else if (this.name == 'rotateBtn') {
 		beginDeg = this.parent.rotation
 	}
 	targetName = ''
@@ -187,4 +205,10 @@ function downloadImage(dataURL) {
 	a.href = dataURL
 	let event = new MouseEvent('click')
 	a.dispatchEvent(event)
+}
+
+function calcDistance(a, b) {
+	let distance
+	distance = Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
+	return distance
 }
