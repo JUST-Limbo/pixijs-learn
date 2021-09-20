@@ -154,15 +154,17 @@ function pointerUp() {
 		containerArr.forEach((item, index, arr) => {
 			if (item.name == this.parent.name) return
 			let distance = calcDistance(this.parent.position, item.position)
-			if (nearestDistance == undefined) {
-				nearestContainer = item
-				nearestDistance = distance
-			} else if (distance < nearestDistance) {
-				nearestContainer = item
-				nearestDistance = distance
+			if (distance < item.width / 2) {
+				if (nearestDistance == undefined) {
+					nearestContainer = item
+					nearestDistance = distance
+				} else if (distance < nearestDistance) {
+					nearestContainer = item
+					nearestDistance = distance
+				}
 			}
 		})
-		if (nearestDistance < 100) {
+		if (nearestContainer && nearestDistance) {
 			this.parent.position.set(nearestContainer.position.x, nearestContainer.position.y)
 		}
 	} else if (this.name == 'rotateBtn') {
