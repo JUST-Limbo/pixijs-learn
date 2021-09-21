@@ -1,7 +1,20 @@
+document.getElementById('stage').oncontextmenu = (e) => {
+	e.preventDefault()
+}
+const menu = document.querySelector('.menu')
+const menuHeight = menu.offsetHeight - parseInt(getComputedStyle(menu)['paddingTop']) - parseInt(getComputedStyle(menu)['paddingBottom'])
+menu.style.height = '0'
+
 const app = new PIXI.Application({
 	width: 800,
 	height: 800
 })
+// app.stage.interactive=true
+// app.stage.on('mousedown', function () {
+// 	closeMenu()
+// })
+app.view.addEventListener('click', closeMenu)
+
 app.renderer.backgroundColor = 0x99ffff
 document.getElementById('stage').appendChild(app.view)
 
@@ -36,7 +49,7 @@ function importFileToStage() {
 		imgSprite.name = 'importImg'
 		imgSprite.interactive = true
 		imgSprite.cursor = 'move'
-		imgSprite.on('pointerdown', pointerDown).on('pointermove', pointerMove).on('pointerup', pointerUp)
+		imgSprite.on('pointerdown', pointerDown).on('pointermove', pointerMove).on('pointerup', pointerUp).on('rightclick', rightclick)
 		container.addChild(imgSprite)
 
 		let resizeBtn = new PIXI.Sprite.fromImage('../images/scale.png')
@@ -174,6 +187,10 @@ function pointerUp() {
 	pointerDownTargetName = ''
 }
 
+function rightclick(e) {
+	openMenu(e.data.global.x, e.data.global.y)
+}
+
 function pointerover() {
 	this.alpha = 0.5
 }
@@ -213,4 +230,15 @@ function calcDistance(a, b) {
 	let distance
 	distance = Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
 	return distance
+}
+
+function openMenu(x, y) {
+	menu.style.left = `${x}px`
+	menu.style.top = `${y + 5}px`
+	menu.style.height = `${menuHeight}px`
+	menu.classList.add('is-active')
+}
+function closeMenu() {
+	menu.style.height = '0'
+	menu.classList.remove('is-active')
 }
